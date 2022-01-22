@@ -35,7 +35,8 @@ class audioReceiver(QThread):
             try:
                 while self.threadActive:
                     message = com_socket.recv(512)
-                    self.stream.write(message)
+                    if type(message) is bytes:
+                        self.stream.write(message)
             except:
                 print("Error getting audio message")
                 pass
@@ -50,34 +51,41 @@ class audioReceiver(QThread):
 class audioSender(QThread):
     voiceSend = pyqtSignal(str)
 
-    def run(self,host):
+    def __init__(self, host, port, format=pyaudio.paInt16, channels=1, rate=44100, frames_per_buffer=512, mute = True):
+        super(QThread,self).__init__()
         # initiate port
         self.host = host
-        self.port = 9010
+        self.port = port
         self.client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.client.connect((self.host,self.port))
         # initiate audio
         self.audio = pyaudio.PyAudio()
         self.stream = self.audio.open(
-            format=pyaudio.paInt16,
-            channels=1,
-            rate = 44100,
+            format=format,
+            channels=channels,
+            rate = rate,
             input=True,
-            frames_per_buffer=512)
+            frames_per_buffer=frames_per_buffer)
+        self.mute = mute
+        
+    def run(self):
         # connecting to socket
         try:
             self.Thread = True
             while self.Thread:
                 message = self.stream.read(512)
-                try:
-                    self.client.send(message)
-                except:
-                    print("Connection lost")
-                    break
+                if self.mute:
+                    self.client.send("".encode('utf-8'))
+                else:
+                    try:
+                        self.client.send(message)
+                    except:
+                        print("Connection lost")
+                        break
         except:
             print("Error getting audio message")
             pass
-
+    
     def stop(self):
         self.Thread = False
         self.stream.stop_stream()
