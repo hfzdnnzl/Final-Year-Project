@@ -3,6 +3,7 @@ import cv2
 import dlib
 import torch
 import GANnotation
+import imutils
 import numpy as np
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -13,7 +14,7 @@ class demoFx:
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor('models/shape_predictor_68_face_landmarks.dat')
         # gan model
-        self.myGAN = GANnotation.GANnotation(path_to_model='models/myGEN.pth')
+        self.myGAN = GANnotation.GANnotation(path_to_model='models/myGEN.pth',enable_cuda=False)
         # process base image
         self.test_image = cv2.cvtColor(cv2.imread(image_path),cv2.COLOR_BGR2RGB)
         self.test_image = self.test_image/255.0
@@ -84,6 +85,7 @@ class onCamera(QThread):
             ret, frame = self.Capture.read()
             if not ret:
                 continue
+            frame = imutils.resize(frame, width=640)
             self.ImageUpdate.emit(frame)
                 
     def stop(self):
