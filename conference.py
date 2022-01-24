@@ -7,9 +7,10 @@ import pickle
 import imutils
 import dlib
 import time
+import torch
+import GANnotation
 import numpy as np
 from PyQt5.QtCore import *
-from torch import poisson_nll_loss
 
 
 class audioReceiver(QThread):
@@ -201,35 +202,52 @@ class videoSender(QThread):
 class landmarkReceiver(QThread):
     landmarkReceive = pyqtSignal(np.ndarray)
 
-    def __init__(self,host,port):
+    def __init__(self,host,port,image_path='test_images/test_1.jpg',
+    path_to_model='models/myGEN.pth',enable_cuda=True,ganOff=True,skipMax=10):
         super(QThread,self).__init__()
         self.host = host
         self.port = port
         self.server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.server.bind((self.host,self.port))
         self.server.listen()
+        # gan model
+        self.myGAN = GANnotation.GANnotation(path_to_model=path_to_model,enable_cuda=enable_cuda)
+        # process base image
+        self.test_image = cv2.cvtColor(cv2.imread(image_path),cv2.COLOR_BGR2RGB)
+        self.test_image = self.test_image/255.0
+        self.test_image = torch.from_numpy(self.test_image.swapaxes(2,1).swapaxes(1,0))
+        self.test_image = self.test_image.type_as(torch.FloatTensor())
+        # gan state
+        self.ganOff = ganOff
+        self.skipMax = skipMax
 
     def run(self):
         com_socket, address = self.server.accept()
         print(f"Landmarks receiver connected to {address}")
         self.ThreadActive = True
 
+        skipIter = 0
         while self.ThreadActive:
             message = com_socket.recv(4096)
-            try:
-                message = pickle.loads(message)
-            except:
-                continue
+            try: message = pickle.loads(message)
+            except: continue
 
             if type(message) is str:
                 if message == 'camera off':
                     self.landmarkReceive.emit(np.array(['']))
                     time.sleep(1)
-            else:
+            elif self.ganOff:
                 blank = np.zeros((360,640,3),dtype=np.uint8)
                 for point in message:
                     cv2.circle(blank, (int(point[0]), int(point[1])), 2, (200,75,49), -1)
                 self.landmarkReceive.emit(blank)
+            elif not self.ganOff and skipIter%10==0:
+                image, _ = self.myGAN.reenactment(self.test_image,message)
+                image = cv2.resize(image[0],(400,400))
+                self.landmarkReceive.emit(image)
+                skipIter = 0
+            skipIter += 1
+
 
     def stop(self):
         self.ThreadActive = False
