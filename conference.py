@@ -39,7 +39,9 @@ class audioReceiver(QThread):
                 if message!=b'':
                     self.stream.write(message)
             except:
-                print("Error getting audio message")
+                print("Error getting audio")
+                self.voiceReceive.emit("Closing")
+                break
 
     def stop(self):
         self.threadActive = False
@@ -81,7 +83,7 @@ class audioSender(QThread):
                     message = self.stream.read(self.frames_per_buffer)
                     self.client.send(message)
             except:
-                print("Connection to audio receiver lost")
+                print("Error sending audio")
                 break
     
     def stop(self):
@@ -113,13 +115,16 @@ class videoReceiver(QThread):
             data = b''
             while self.ThreadActive:
                 while len(data)<payload_size:
-                    message = com_socket.recv(4096)
-                    if message == b'':
+                    try:message = com_socket.recv(4096)
+                    except:
+                        print("Error getting video")
+                        time.sleep(1)
                         break
+                    if message == b'':break
                     data += message
 
-                if message ==b'':
-                    break
+                if data ==b'':break
+                if message ==b'':break
 
                 packed_msg_size = data[:payload_size]
                 data = data[payload_size:]
@@ -174,7 +179,8 @@ class videoSender(QThread):
                         self.client.sendall(message)
                     self.Capture.release()
             except:
-                print("Connection to video lost")
+                print("Error sending video")
+                break
 
     def stop(self):
         self.ThreadActive = False
@@ -207,14 +213,21 @@ class landmarkReceiver(QThread):
 
     def run(self):
         com_socket, address = self.server.accept()
+        self.server.settimeout(5)
         print(f"Landmarks receiver connected to {address}")
         self.ThreadActive = True
 
         skipIter = 0
         while self.ThreadActive:
-            message = com_socket.recv(4096)
-            try: message = pickle.loads(message)
-            except: continue
+            try:message = com_socket.recv(4096)
+            except:
+                print("Error getting facial landmarks")
+                time.sleep(1)
+                break
+            try:message = pickle.loads(message)
+            except: 
+                print("Unable to load facial landmarks")
+                continue
 
             if type(message) is str:
                 if message == 'camera off':
@@ -293,7 +306,8 @@ class landmarkSender(QThread):
                     # release camera
                     self.Capture.release()
             except:
-                print("Connection to facial landmarks receiver lost")
+                print("Error sending facial landmarks")
+                break
     
     def stop(self):
         self.ThreadActive = False

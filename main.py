@@ -80,22 +80,23 @@ class MainWindow(QDialog):
         local_ip = self.local_ip_address_lineEdit.text().strip()
         widget.currentWidget().local_ip_address_label.setText("Local IP Address: " + local_ip)
         widget.currentWidget().local_ip = local_ip
+        widget.currentWidget().client_ip_address_label.setText("Local IP Address: waiting...")
         # try connecting
         try:widget.currentWidget().startListening(True)
         except:
             widget.setCurrentIndex(0)
             self.popupWindow("Error Found","Unable to connect to the local IP address")
 
-    def popupWindow(self,title,errorMessage,Icon=QMessageBox.Critical):
-        msg = QMessageBox()
-        msg.setWindowTitle(title)
-        msg.setWindowIcon(QIcon("user_interfaces/sharingan_icon.png"))
-        msg.setText(errorMessage)
-        msg.setStyleSheet("QMessageBox{background-color: rgb(22, 22, 22);border-radius:15px;border-width :1px;} QLabel{color: rgb(236, 219, 186)}")
-        msg.setIcon(Icon)
-        # msg.setWindowFlags(Qt.FramelessWindowHint)
-        msg.exec_()
-
+    def popupWindow(self,title,errorMessage,Icon=QMessageBox.Critical,frameless=False,buttonless=False):
+        self.msg = QMessageBox()
+        if frameless:self.msg.setWindowFlags(Qt.FramelessWindowHint)
+        if buttonless:self.msg.setStandardButtons(QMessageBox.NoButton)
+        self.msg.setWindowTitle(title)
+        self.msg.setWindowIcon(QIcon("user_interfaces/sharingan_icon.png"))
+        self.msg.setText(errorMessage)
+        self.msg.setStyleSheet("QMessageBox{background-color: rgb(22, 22, 22);border-radius:15px;border-width :1px;} QLabel{color: rgb(236, 219, 186)}")
+        self.msg.setIcon(Icon)
+        self.msg.exec_()
 
     def goToDemoScreen(self):
         widget.setCurrentIndex(2)
@@ -176,6 +177,29 @@ class ConferenceWindow(QDialog):
         self.client_ip = ip_address
         self.client_ip_address_label.setText("Client IP Address: "+ip_address)
         self.startSending()
+        self.audio_receiver.voiceReceive.disconnect(self.serverRespond)
+        self.audio_receiver.voiceReceive.connect(self.serverClose)
+
+    def serverClose(self,message):
+        if message!='Closing':return
+        print("Closing app")
+        self.audio_receiver.stop()
+        self.video_receiver.stop()
+        self.landmarks_receiver.stop()
+        self.audio_sender.stop()
+        self.video_sender.stop()
+        self.landmarks_sender.stop()
+        self.popupWindow("Close","Connection Lost",QMessageBox.Information)
+        widget.close()
+
+    def popupWindow(self,title,errorMessage,Icon=QMessageBox.Critical):
+        msg = QMessageBox()
+        msg.setWindowTitle(title)
+        msg.setWindowIcon(QIcon("user_interfaces/sharingan_icon.png"))
+        msg.setText(errorMessage)
+        msg.setStyleSheet("QMessageBox{background-color: rgb(22, 22, 22);border-radius:15px;border-width :1px;} QLabel{color: rgb(236, 219, 186)}")
+        msg.setIcon(Icon)
+        msg.exec_()
 
     def goToMainScreen(self):
         try:
@@ -186,8 +210,9 @@ class ConferenceWindow(QDialog):
             self.video_sender.stop()
             self.landmarks_sender.stop()
         except:
-            print("Never run")
-        widget.setCurrentIndex(0)
+            print("Some threads were never run")
+        self.popupWindow("Close","Connection closed",QMessageBox.Information)
+        widget.close()
 
     def copyIP(self):
         pc.copy(self.local_ip)
