@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>GoGo Meat!</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(22, 22, 22);</string>
@@ -31,7 +31,7 @@
       <x>-1</x>
       <y>-7</y>
       <width>1321</width>
-      <height>681</height>
+      <height>686</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -49,7 +49,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>400</height>
+         <height>300</height>
         </size>
        </property>
        <property name="font">
@@ -138,6 +138,59 @@
         </widget>
        </item>
       </layout>
+     </item>
+     <item alignment="Qt::AlignHCenter">
+      <widget class="QCheckBox" name="saveAddressCB">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color:rgb(200, 75, 49);</string>
+       </property>
+       <property name="text">
+        <string>Save IP Address</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item alignment="Qt::AlignHCenter">
+      <widget class="QCheckBox" name="enableCudaCB">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color:rgb(200, 75, 49);</string>
+       </property>
+       <property name="text">
+        <string>Enable Cuda</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item alignment="Qt::AlignHCenter">
       <widget class="QPushButton" name="joinButton">

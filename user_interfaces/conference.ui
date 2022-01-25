@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>GoGo Meat!</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(22, 22, 22);</string>

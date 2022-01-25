@@ -1,14 +1,5 @@
 
-import socket
-import struct
-import cv2
-import pyaudio
-import pickle
-import imutils
-import dlib
-import time
-import torch
-import GANnotation
+import socket,struct,cv2,pyaudio,pickle,imutils,dlib,time,torch,GANnotation
 import numpy as np
 from PyQt5.QtCore import *
 
@@ -41,14 +32,14 @@ class audioReceiver(QThread):
         com_socket, address = self.server.accept()
         print(f"Audio receiver connected to {address}")
         self.voiceReceive.emit(address[0])
-        try:
-            while self.threadActive:
+        
+        while self.threadActive:
+            try:
                 message = com_socket.recv(self.frames_per_buffer)
                 if message!=b'':
                     self.stream.write(message)
-        except:
-            print("Error getting audio message")
-            pass
+            except:
+                print("Error getting audio message")
 
     def stop(self):
         self.threadActive = False
@@ -80,22 +71,18 @@ class audioSender(QThread):
         
     def run(self):
         # connecting to socket
-        try:
-            self.Thread = True
-            while self.Thread:
-                try:
-                    if self.mute:
-                        self.client.send("".encode('utf-8'))
-                        time.sleep(1)
-                    else:
-                        message = self.stream.read(self.frames_per_buffer)
-                        self.client.send(message)
-                except:
-                    print("Connection lost")
-                    break
-        except:
-            print("Error sending audio message")
-            pass
+        self.Thread = True
+        while self.Thread:
+            try:
+                if self.mute:
+                    self.client.send("".encode('utf-8'))
+                    time.sleep(1)
+                else:
+                    message = self.stream.read(self.frames_per_buffer)
+                    self.client.send(message)
+            except:
+                print("Connection to audio receiver lost")
+                break
     
     def stop(self):
         self.Thread = False
@@ -166,36 +153,33 @@ class videoSender(QThread):
     def run(self):
         self.ThreadActive = True
         while self.ThreadActive:
-            if self.cameraOff:
-                self.client.sendall(''.encode('utf-8'))
-                time.sleep(1)
-                continue
-            else:
-                self.Capture = cv2.VideoCapture(0)
-                while not self.cameraOff:
-                    ret, frame = self.Capture.read()
-                    if not ret:
-                        continue
-                    # reformat data
-                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    frame = imutils.resize(frame,width=640)
-                    self.videoSend.emit(frame)
-                    # send data
-                    data = pickle.dumps(frame)
-                    message = struct.pack("Q",len(data))+data
-                    self.client.sendall(message)
             try:
-                self.Capture.release()
-                print('release webcam')
+                if self.cameraOff:
+                    self.client.sendall(''.encode('utf-8'))
+                    time.sleep(1)
+                    continue
+                else:
+                    self.Capture = cv2.VideoCapture(0)
+                    while not self.cameraOff:
+                        ret, frame = self.Capture.read()
+                        if not ret:
+                            continue
+                        # reformat data
+                        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                        frame = imutils.resize(frame,width=640)
+                        self.videoSend.emit(frame)
+                        # send data
+                        data = pickle.dumps(frame)
+                        message = struct.pack("Q",len(data))+data
+                        self.client.sendall(message)
+                    self.Capture.release()
             except:
-                print('attempted to release unused camera')
+                print("Connection to video lost")
 
     def stop(self):
         self.ThreadActive = False
-        try:
-            self.Capture.release()
-        except:
-            print("Camera released")
+        try:self.Capture.release()
+        except:print("Camera unused")
         self.terminate()
 
 
@@ -271,42 +255,46 @@ class landmarkSender(QThread):
         self.ThreadActive = True
         self.cameraOff = True
         while self.ThreadActive:
-            if self.detectorOff and self.cameraOff:
-                self.landmarkSend.emit(np.array(['']))
-                self.client.send(pickle.dumps('camera off'))
-                time.sleep(1)
-            elif not self.detectorOff and not self.cameraOff:
-                self.Capture = cv2.VideoCapture(0)
-                while not self.detectorOff:
-                    ret, frame = self.Capture.read()
-                    if not ret:
-                        continue
-                    # reformat image
-                    frame = imutils.resize(frame,width=640)
-                    gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-                    # detect face
-                    faces = self.detector(gray)
-                    if len(faces) == 0: continue
-                    face = faces[0]
-                    landmarks = self.predictor(gray,face)
-                    # change data shape
-                    blank = np.zeros((360,640,3),dtype=np.uint8)
-                    points = []
-                    for n in range(68):
-                        if n==60 or n==64:
+            try:
+                if self.detectorOff and self.cameraOff:
+                    self.landmarkSend.emit(np.array(['']))
+                    self.client.send(pickle.dumps('camera off'))
+                    time.sleep(1)
+                elif not self.detectorOff and not self.cameraOff:
+                    self.Capture = cv2.VideoCapture(0)
+                    while not self.detectorOff:
+                        ret, frame = self.Capture.read()
+                        if not ret:
                             continue
-                        points.append(landmarks.part(n).x)
-                        points.append(landmarks.part(n).y)
-                        # draw facial landmarks
-                        cv2.circle(blank,(landmarks.part(n).x,landmarks.part(n).y),2,(200,75,49),-1)
-                    points = np.array(points)
-                    points = points.transpose().reshape(66,2,-1)
-                    # send data
-                    data = pickle.dumps(points)
-                    self.client.send(data)
-                    self.landmarkSend.emit(blank)
-                # release camera
-                self.Capture.release()
+                        # reformat image
+                        frame = imutils.resize(frame,width=640)
+                        gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+                        # detect face
+                        faces = self.detector(gray)
+                        if len(faces) == 0: continue
+                        face = faces[0]
+                        landmarks = self.predictor(gray,face)
+                        # change data shape
+                        blank = np.zeros((360,640,3),dtype=np.uint8)
+                        points = []
+                        for n in range(68):
+                            if n==60 or n==64:
+                                continue
+                            points.append(landmarks.part(n).x)
+                            points.append(landmarks.part(n).y)
+                            # draw facial landmarks
+                            cv2.circle(blank,(landmarks.part(n).x,landmarks.part(n).y),2,(200,75,49),-1)
+                        self.landmarkSend.emit(blank)
+                        points = np.array(points)
+                        points = points.transpose().reshape(66,2,-1)
+                        # send data
+                        data = pickle.dumps(points)
+                        self.client.send(data)
+                    # release camera
+                    self.Capture.release()
+            except:
+                print("Connection to facial landmarks receiver lost")
+    
     def stop(self):
         self.ThreadActive = False
         self.terminate()

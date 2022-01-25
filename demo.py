@@ -1,18 +1,16 @@
 
-import cv2
-import dlib
-import torch
-import GANnotation
-import imutils
+import cv2,dlib,torch,GANnotation,imutils
 import numpy as np
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
 class demoFx:
-    def __init__(self,image_path = 'test_images/test_1.jpg'):
+    def __init__(self,image_path = 'test_images/test_1.jpg',enable_cuda=False):
         # facial landmarks
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor('models/shape_predictor_68_face_landmarks.dat')
+        # gan model
+        self.myGAN = GANnotation.GANnotation(path_to_model='models/myGEN.pth',enable_cuda=enable_cuda)
         # process base image
         self.test_image = cv2.cvtColor(cv2.imread(image_path),cv2.COLOR_BGR2RGB)
         self.test_image = self.test_image/255.0
@@ -46,9 +44,7 @@ class demoFx:
         blank = QPixmap.fromImage(blank)
         return blank
     
-    def facialReenactmentFrame(self,Image,enable_cuda=False):
-        # gan model
-        self.myGAN = GANnotation.GANnotation(path_to_model='models/myGEN.pth',enable_cuda=enable_cuda)
+    def facialReenactmentFrame(self,Image):
         # detect face
         Gray = cv2.cvtColor(Image, cv2.COLOR_BGR2GRAY)
         faces = self.detector(Gray)
@@ -67,12 +63,12 @@ class demoFx:
             image, _ = self.myGAN.reenactment(self.test_image,points)
             image = cv2.resize(image[0],(400,400))
             break
-        image = QImage(image.data,
+        frame = QImage(image.data,
                         image.shape[1],
                         image.shape[0],
                         QImage.Format_RGB888)
-        image = QPixmap.fromImage(image)
-        return image
+        frame = QPixmap.fromImage(frame)
+        return frame
 
 class onCamera(QThread):
     ImageUpdate = pyqtSignal(np.ndarray)
