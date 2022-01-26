@@ -109,6 +109,10 @@ class videoReceiver(QThread):
         com_socket, address = self.server.accept()
         print(f"Video receiver connected to {address}")
         self.ThreadActive = True
+        # frame rate init
+        pTime = 0
+        currentFPS = 0
+        fps = []
 
         while self.ThreadActive:
             payload_size = struct.calcsize('Q')
@@ -138,7 +142,17 @@ class videoReceiver(QThread):
                 data = data[msg_size:]
                 frame = pickle.loads(frame_data)
 
-                self.videoReceive.emit(frame)
+                # count frame rate
+                cTime = time.time()
+                fps.append(1/(cTime-pTime))
+                pTime = cTime
+                # update frame rate
+                if len(fps)>=10:
+                    currentFPS = int(np.mean(fps))
+                    fps = []
+
+                frame_list = np.array([frame,currentFPS])
+                self.videoReceive.emit(frame_list)
 
     def stop(self):
         self.ThreadActive = False
@@ -164,6 +178,11 @@ class videoSender(QThread):
                     time.sleep(1)
                     continue
                 else:
+                    # frame rate init
+                    pTime = 0
+                    currentFPS = 0
+                    fps = []
+
                     self.Capture = cv2.VideoCapture(0)
                     while not self.cameraOff:
                         ret, frame = self.Capture.read()
@@ -172,7 +191,17 @@ class videoSender(QThread):
                         # reformat data
                         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         frame = imutils.resize(frame,width=640)
-                        self.videoSend.emit(frame)
+                        # calculate frame rate
+                        cTime = time.time()
+                        fps.append(1/(cTime-pTime))
+                        pTime = cTime
+                        # update frame rate
+                        if len(fps)>=10:
+                            currentFPS = int(np.mean(fps))
+                            fps = []
+                        # send data
+                        frame_list = np.array([frame,currentFPS])
+                        self.videoSend.emit(frame_list)
                         # send data
                         data = pickle.dumps(frame)
                         message = struct.pack("Q",len(data))+data
@@ -216,8 +245,12 @@ class landmarkReceiver(QThread):
         self.server.settimeout(5)
         print(f"Landmarks receiver connected to {address}")
         self.ThreadActive = True
-
         skipIter = 0
+        # frame rate init
+        pTime = 0
+        currentFPS = 0
+        fps = []
+
         while self.ThreadActive:
             try:message = com_socket.recv(4096)
             except:
@@ -229,6 +262,15 @@ class landmarkReceiver(QThread):
                 print("Unable to load facial landmarks")
                 continue
 
+            # count frame rate
+            cTime = time.time()
+            fps.append(1/(cTime-pTime))
+            pTime = cTime
+            # update frame rate
+            if len(fps)>=10:
+                currentFPS = int(np.mean(fps))
+                fps = []
+
             if type(message) is str:
                 if message == 'camera off':
                     self.landmarkReceive.emit(np.array(['']))
@@ -237,11 +279,15 @@ class landmarkReceiver(QThread):
                 blank = np.zeros((360,640,3),dtype=np.uint8)
                 for point in message:
                     cv2.circle(blank, (int(point[0]), int(point[1])), 2, (200,75,49), -1)
-                self.landmarkReceive.emit(blank)
+                # send data
+                blank_list = np.array([blank,currentFPS])
+                self.landmarkReceive.emit(blank_list)
             elif not self.ganOff and skipIter%10==0:
                 image, _ = self.myGAN.reenactment(self.test_image,message)
                 image = cv2.resize(image[0],(400,400))
-                self.landmarkReceive.emit(image)
+                # send data
+                image_list = np.array([image,currentFPS])
+                self.landmarkReceive.emit(image_list)
                 skipIter = 0
             skipIter += 1
 
@@ -274,8 +320,14 @@ class landmarkSender(QThread):
                     self.client.send(pickle.dumps('camera off'))
                     time.sleep(1)
                 elif not self.detectorOff and not self.cameraOff:
+                    # frame rate init
+                    pTime = 0
+                    currentFPS = 0
+                    fps = []
+
                     self.Capture = cv2.VideoCapture(0)
                     while not self.detectorOff:
+                        # capture image
                         ret, frame = self.Capture.read()
                         if not ret:
                             continue
@@ -287,7 +339,7 @@ class landmarkSender(QThread):
                         if len(faces) == 0: continue
                         face = faces[0]
                         landmarks = self.predictor(gray,face)
-                        # change data shape
+                        # get facial landmark points
                         blank = np.zeros((360,640,3),dtype=np.uint8)
                         points = []
                         for n in range(68):
@@ -297,7 +349,18 @@ class landmarkSender(QThread):
                             points.append(landmarks.part(n).y)
                             # draw facial landmarks
                             cv2.circle(blank,(landmarks.part(n).x,landmarks.part(n).y),2,(200,75,49),-1)
-                        self.landmarkSend.emit(blank)
+                        # count frame rate
+                        cTime = time.time()
+                        fps.append(1/(cTime-pTime))
+                        pTime = cTime
+                        # update frame rate
+                        if len(fps)>=10:
+                            currentFPS = int(np.mean(fps))
+                            fps = []
+                        # send data
+                        blank_list = np.array([blank,currentFPS])
+                        self.landmarkSend.emit(blank_list)
+                        # reshape image
                         points = np.array(points)
                         points = points.transpose().reshape(66,2,-1)
                         # send data

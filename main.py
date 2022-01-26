@@ -124,7 +124,10 @@ class ConferenceWindow(QDialog):
     def localImageUpdateSlot(self,Image):
         if len(Image)==1:
             self.localCameraLabel.setText("Local Camera")
-        else:
+            self.localFrameLabel.setText("0 fps")
+        elif len(Image)==2:
+            self.localFrameLabel.setText(str(Image[1]) + " fps")
+            Image = Image[0]
             Image = QImage(
                 Image.data,
                 Image.shape[1],
@@ -133,10 +136,14 @@ class ConferenceWindow(QDialog):
             Image = QPixmap.fromImage(Image)
             self.localCameraLabel.setPixmap(Image)
 
+
     def clientImageUpdateSlot(self,Image):
         if len(Image)==1:
             self.clientCameraLabel.setText("Client Camera")
-        else:
+            self.clientFrameLabel.setText("0 fps")
+        elif len(Image)==2:
+            self.clientFrameLabel.setText(str(Image[1]) + " fps")
+            Image = Image[0]
             Image = QImage(
                 Image.data,
                 Image.shape[1],
