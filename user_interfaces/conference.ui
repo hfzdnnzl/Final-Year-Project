@@ -299,6 +299,211 @@ border-radius:15px;
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>870</x>
+      <y>440</y>
+      <width>451</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <property name="leftMargin">
+      <number>50</number>
+     </property>
+     <property name="topMargin">
+      <number>20</number>
+     </property>
+     <property name="bottomMargin">
+      <number>100</number>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="dl_Title">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>Download Size</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="comma_dl">
+         <property name="maximumSize">
+          <size>
+           <width>10</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="downloadSizeLabel">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>0 kb/s</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="ul_Title">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>Upload Size</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="comma_ul">
+         <property name="maximumSize">
+          <size>
+           <width>10</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="uploadSizeLabel">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>0 kb/s</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QLabel" name="lf_Title">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>Local Frames</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="comma_lf">
+         <property name="maximumSize">
+          <size>
+           <width>10</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="localFrameLabel">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>0 fps</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="cf_Title">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>Client Frames</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="comma_cf">
+         <property name="maximumSize">
+          <size>
+           <width>10</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="clientFrameLabel">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(236, 219, 186);</string>
+         </property>
+         <property name="text">
+          <string>0 fps</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
   </widget>
  </widget>
  <resources/>
