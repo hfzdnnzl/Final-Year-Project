@@ -141,6 +141,7 @@ class videoReceiver(QThread):
                 frame_data = data[:msg_size]
                 data = data[msg_size:]
                 frame = pickle.loads(frame_data)
+                frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
 
                 # count frame rate
                 cTime = time.time()
@@ -203,6 +204,7 @@ class videoSender(QThread):
                         frame_list = np.array([frame,currentFPS])
                         self.videoSend.emit(frame_list)
                         # send data
+                        frame = cv2.imencode('.jpg',frame,[int(cv2.IMWRITE_JPEG_QUALITY), 90])
                         data = pickle.dumps(frame)
                         message = struct.pack("Q",len(data))+data
                         self.client.sendall(message)
