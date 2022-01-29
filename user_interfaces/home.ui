@@ -14,7 +14,38 @@
    <string>GoGo Meat!</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(22, 22, 22);</string>
+   <string notr="true">QDialog {
+background-color: QLinearGradient(x1:0, y1:0, x2:1, y2:1, stop: 0 #2193b0, stop: 1 #6dd5ed);
+}
+QPushButton{
+background-color: white;
+color:#2193b0;
+border:0;
+padding: 10px 15px;
+border-radius: 3px;
+/*transition-duration: 0.25s;*/
+}
+QPushButton:hover{
+background-color: #2193b0;
+color:white;
+border: 1px solid white;
+}
+QLineEdit{
+border: 1px solid white;
+background-color: rgba(255,255,255,0.1);
+border-radius: 3px;
+padding: 10px 15px;
+margin: 0 auto 10px auto;
+color:white;
+/*transition-duration: 0.25s;*/
+}
+QLineEdit:hover{
+background-color: rgba(255,255,255,0.4);
+}
+QLineEdit:focus{
+background-color: white;
+color: #2193b0;
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget" native="true">
    <property name="geometry">
@@ -25,13 +56,16 @@
      <height>660</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
       <x>-1</x>
       <y>-7</y>
       <width>1321</width>
-      <height>686</height>
+      <height>719</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -60,7 +94,7 @@
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">color:rgb(200, 75, 49);</string>
+        <string notr="true">color:white;</string>
        </property>
        <property name="text">
         <string>Welcome to Gogo Meat!</string>
@@ -70,74 +104,69 @@
        </property>
       </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <property name="leftMargin">
-        <number>400</number>
+     <item alignment="Qt::AlignHCenter">
+      <widget class="QLineEdit" name="local_ip_address_lineEdit">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>0</height>
+        </size>
        </property>
-       <property name="rightMargin">
-        <number>400</number>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
        </property>
-       <item>
-        <widget class="QLabel" name="local_ip_address_label">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">color:rgb(200, 75, 49);</string>
-         </property>
-         <property name="text">
-          <string>Local IP Address  :</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="local_ip_address_lineEdit">
-         <property name="styleSheet">
-          <string notr="true">color: rgb(236, 219, 186);</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="inputMask">
+        <string/>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="placeholderText">
+        <string>Local IPv4</string>
+       </property>
+      </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <property name="leftMargin">
-        <number>400</number>
+     <item alignment="Qt::AlignHCenter">
+      <widget class="QLineEdit" name="client_ip_address_lineEdit">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>0</height>
+        </size>
        </property>
-       <property name="rightMargin">
-        <number>400</number>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
        </property>
-       <item>
-        <widget class="QLabel" name="client_ip_address_label">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">color:rgb(200, 75, 49);</string>
-         </property>
-         <property name="text">
-          <string>Client IP Address :</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="client_ip_address_lineEdit">
-         <property name="styleSheet">
-          <string notr="true">color: rgb(236, 219, 186);</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="inputMask">
+        <string/>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="placeholderText">
+        <string>Client IPv4</string>
+       </property>
+      </widget>
      </item>
      <item alignment="Qt::AlignHCenter">
       <widget class="QCheckBox" name="saveAddressCB">
@@ -154,7 +183,7 @@
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">color:rgb(200, 75, 49);</string>
+        <string notr="true">color:white;</string>
        </property>
        <property name="text">
         <string>Save IP Address</string>
@@ -182,7 +211,7 @@
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">color:rgb(200, 75, 49);</string>
+        <string notr="true">color:white;</string>
        </property>
        <property name="text">
         <string>Enable Cuda</string>
@@ -197,7 +226,7 @@
        <property name="minimumSize">
         <size>
          <width>200</width>
-         <height>30</height>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -206,9 +235,14 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <kerning>true</kerning>
+        </font>
+       </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(236, 219, 186);
-color: rgb(22, 22, 22);</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>Join meeting</string>
@@ -220,7 +254,7 @@ color: rgb(22, 22, 22);</string>
        <property name="minimumSize">
         <size>
          <width>200</width>
-         <height>30</height>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -229,12 +263,16 @@ color: rgb(22, 22, 22);</string>
          <height>16777215</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(236, 219, 186);
-color: rgb(22, 22, 22);</string>
+        <string notr="true"/>
        </property>
        <property name="text">
-        <string>New meeting</string>
+        <string>New Meeting</string>
        </property>
       </widget>
      </item>
@@ -243,7 +281,7 @@ color: rgb(22, 22, 22);</string>
        <property name="minimumSize">
         <size>
          <width>200</width>
-         <height>30</height>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -252,12 +290,16 @@ color: rgb(22, 22, 22);</string>
          <height>16777215</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(236, 219, 186);
-color: rgb(22, 22, 22);</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>Demo</string>

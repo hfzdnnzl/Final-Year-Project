@@ -80,7 +80,7 @@ class MainWindow(QDialog):
         local_ip = self.local_ip_address_lineEdit.text().strip()
         widget.currentWidget().local_ip_address_label.setText("Local IP Address: " + local_ip)
         widget.currentWidget().local_ip = local_ip
-        widget.currentWidget().client_ip_address_label.setText("Local IP Address: waiting...")
+        widget.currentWidget().client_ip_address_label.setText("Client IP Address: waiting...")
         # try connecting
         try:widget.currentWidget().startListening(True)
         except:
@@ -127,6 +127,7 @@ class ConferenceWindow(QDialog):
             self.localFrameLabel.setText("0 fps")
         elif len(Image)==2:
             self.localFrameLabel.setText(str(Image[1]) + " fps")
+            self.uploadSizeLabel.setText(self.convert_size(Image[2]))
             Image = Image[0]
             Image = QImage(
                 Image.data,
@@ -136,13 +137,13 @@ class ConferenceWindow(QDialog):
             Image = QPixmap.fromImage(Image)
             self.localCameraLabel.setPixmap(Image)
 
-
     def clientImageUpdateSlot(self,Image):
         if len(Image)==1:
             self.clientCameraLabel.setText("Client Camera")
             self.clientFrameLabel.setText("0 fps")
         elif len(Image)==2:
             self.clientFrameLabel.setText(str(Image[1]) + " fps")
+            self.downloadSizeLabel.setText(self.convert_size(Image[2]))
             Image = Image[0]
             Image = QImage(
                 Image.data,
@@ -168,6 +169,7 @@ class ConferenceWindow(QDialog):
         self.landmarks_receiver.start()
 
     def startSending(self):
+        self.audio_receiver.voiceReceive.connect(self.serverClose)
         # audio
         self.audio_sender = conference.audioSender(self.client_ip,9999)
         self.audio_sender.start()
@@ -183,9 +185,8 @@ class ConferenceWindow(QDialog):
     def serverRespond(self,ip_address):
         self.client_ip = ip_address
         self.client_ip_address_label.setText("Client IP Address: "+ip_address)
-        self.startSending()
         self.audio_receiver.voiceReceive.disconnect(self.serverRespond)
-        self.audio_receiver.voiceReceive.connect(self.serverClose)
+        self.startSending()
 
     def serverClose(self,message):
         if message!='Closing':return
@@ -280,6 +281,15 @@ class ConferenceWindow(QDialog):
             self.facialReenactmentButton.setText("Show Facial Reenactment")
             self.facialReenactmentButton.setStyleSheet("background-color:rgb(236, 219, 186);")
             self.landmarks_receiver.ganOff = True
+
+    def convert_size(size_bytes):
+        if size_bytes == 0:
+            return "0B"
+        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+        i = int(math.floor(math.log(size_bytes, 1024)))
+        p = math.pow(1024, i)
+        s = round(size_bytes / p, 2)
+        return "%s %s" % (s, size_name[i])
 ### CODING ABOVE
 
 class DemoWindow(QDialog):
@@ -296,6 +306,14 @@ class DemoWindow(QDialog):
         # gan iter
         self.gan_iter = 0
         self.gan_iter_max = 10
+        # button stylesheet
+        self.NormalButtonCSS = 'QPushButton{background-color:white;color:#2193b0;}'
+        self.NormalButtonCSS +='QPushButton:hover{background-color:rgb(245, 247, 249);}'
+
+        self.DisabledButtonCSS = 'QPushButon{background-color:white;color:grey;}'
+
+        self.CancelButtonCSS = 'QPushButton{background-color:red;color:white;}'
+        self.CancelButtonCSS += 'QPushButton:hover{background-color:rgba(255,0,0,0.5)}'
 
     def goToMainScreen(self):
         self.stopCamera()
@@ -311,7 +329,8 @@ class DemoWindow(QDialog):
         
     def demoImageUpdateSlotv2(self, Image):
         if self.gan_iter%self.gan_iter_max==0:
-            image = self.demoFx.facialReenactmentFrame(Image)
+            try:image = self.demoFx.facialReenactmentFrame(Image)
+            except: return
             self.clientCameraLabel.setPixmap(image)
         # iterate
         self.gan_iter += 1
@@ -326,7 +345,7 @@ class DemoWindow(QDialog):
             self.facialLandmarksButton.setEnabled(True)
             self.facialReenactmentButton.setEnabled(True)
             # start button status
-            self.startCameraButton.setStyleSheet('background-color:rgb(208, 52, 44);')
+            self.startCameraButton.setStyleSheet(self.CancelButtonCSS)
             self.startCameraButton.setText('Stop camera')
             
         elif self.startCameraButton.text() == 'Stop camera':
@@ -342,27 +361,42 @@ class DemoWindow(QDialog):
         self.facialLandmarksButton.setEnabled(False)
         self.facialReenactmentButton.setEnabled(False)
         # start button status
-        self.startCameraButton.setStyleSheet('background-color: rgb(236, 219, 186);')
+        self.startCameraButton.setStyleSheet(self.NormalButtonCSS)
         self.startCameraButton.setText('Start camera')
+        # close facial reenactment
+        try:
+            self.onCamera.ImageUpdate.disconnect(self.demoImageUpdateSlotv2)
+            self.clientCameraLabel.setText("Demo Frames")
+            self.facialReenactmentButton.setStyleSheet(self.DisabledButtonCSS)
+            self.facialReenactmentButton.setText('Show facial reenactment')
+        except: print('Facial Reenactment Unused')
+        # close facial landmarks
+        try:
+            self.onCamera.ImageUpdate.disconnect(self.demoImageUpdateSlotv1)
+            self.clientCameraLabel.setText("Demo Frames")
+            self.facialLandmarksButton.setStyleSheet(self.DisabledButtonCSS)
+            self.facialLandmarksButton.setText('Show facial landmarks')
+        except: print('Facial Landmarks Unused')
+
         
     def FacialLandmarks(self):
         # close other button
         try:
             self.onCamera.ImageUpdate.disconnect(self.demoImageUpdateSlotv2)
             self.clientCameraLabel.setText("Demo Frames")
-            self.facialReenactmentButton.setStyleSheet('background-color:rgb(236, 219, 186);')
+            self.facialReenactmentButton.setStyleSheet(self.NormalButtonCSS)
             self.facialReenactmentButton.setText('Show facial reenactment')
         except:
             print('function detached')
         # start process
         if self.clientCameraLabel.text() == 'Demo Frames':
             self.onCamera.ImageUpdate.connect(self.demoImageUpdateSlotv1)
-            self.facialLandmarksButton.setStyleSheet('background-color:rgb(208, 52, 44);')
+            self.facialLandmarksButton.setStyleSheet(self.CancelButtonCSS)
             self.facialLandmarksButton.setText('Hide facial landmarks')
         else:
             self.onCamera.ImageUpdate.disconnect(self.demoImageUpdateSlotv1)
             self.clientCameraLabel.setText("Demo Frames")
-            self.facialLandmarksButton.setStyleSheet('background-color:rgb(236, 219, 186);')
+            self.facialLandmarksButton.setStyleSheet(self.NormalButtonCSS)
             self.facialLandmarksButton.setText('Show facial landmarks')
             
     def FacialReenactment(self):
@@ -370,19 +404,19 @@ class DemoWindow(QDialog):
         try:
             self.onCamera.ImageUpdate.disconnect(self.demoImageUpdateSlotv1)
             self.clientCameraLabel.setText("Demo Frames")
-            self.facialLandmarksButton.setStyleSheet('background-color:rgb(236, 219, 186);')
+            self.facialLandmarksButton.setStyleSheet(self.NormalButtonCSS)
             self.facialLandmarksButton.setText('Show facial landmarks')
         except:
             print('function detached')
         # start process
         if self.clientCameraLabel.text() == 'Demo Frames':
             self.onCamera.ImageUpdate.connect(self.demoImageUpdateSlotv2)
-            self.facialReenactmentButton.setStyleSheet('background-color:rgb(208, 52, 44);')
+            self.facialReenactmentButton.setStyleSheet(self.CancelButtonCSS)
             self.facialReenactmentButton.setText('Hide facial reenactment')
         else:
             self.onCamera.ImageUpdate.disconnect(self.demoImageUpdateSlotv2)
             self.clientCameraLabel.setText("Demo Frames")
-            self.facialReenactmentButton.setStyleSheet('background-color:rgb(236, 219, 186);')
+            self.facialReenactmentButton.setStyleSheet(self.NormalButtonCSS)
             self.facialReenactmentButton.setText('Show facial reenactment')
 
 
@@ -402,7 +436,6 @@ if __name__ == "__main__":
 
     widget.setFixedHeight(660)
     widget.setFixedWidth(1320)
-
 
     widget.show()
     sys.exit(app.exec_())

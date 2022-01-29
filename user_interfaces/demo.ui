@@ -14,7 +14,23 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(22, 22, 22);</string>
+   <string notr="true">QDialog {
+background-color: QLinearGradient(x1:0, y1:0, x2:1, y2:1, stop: 0 #2193b0, stop: 1 #6dd5ed);
+}
+QPushButton{
+background-color: white;
+color:#2193b0;
+border-radius: 10px;
+/*transition-duration: 0.25s;*/
+}
+QPushButton:hover{
+background-color:#2193b0;
+color: white;
+border: 1px solid white;
+}
+QPushButton:disabled{
+color: grey;
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget" native="true">
    <property name="geometry">
@@ -55,8 +71,14 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
        <property name="styleSheet">
-        <string notr="true">background-color:rgb(200, 75, 49);
+        <string notr="true">background-color:white;
+color:#2193b0;
 border-radius:15px;</string>
        </property>
        <property name="text">
@@ -81,8 +103,14 @@ border-radius:15px;</string>
          <height>16777215</height>
         </size>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
        <property name="styleSheet">
-        <string notr="true">background-color:rgb(200, 75, 49);
+        <string notr="true">background-color:white;
+color:#2193b0;
 border-radius:15px;
 </string>
        </property>
@@ -116,7 +144,7 @@ border-radius:15px;
       <widget class="QPushButton" name="startCameraButton">
        <property name="minimumSize">
         <size>
-         <width>250</width>
+         <width>200</width>
          <height>30</height>
         </size>
        </property>
@@ -127,7 +155,7 @@ border-radius:15px;
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(236, 219, 186);</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>Start camera</string>
@@ -141,7 +169,7 @@ border-radius:15px;
        </property>
        <property name="minimumSize">
         <size>
-         <width>250</width>
+         <width>200</width>
          <height>30</height>
         </size>
        </property>
@@ -152,7 +180,7 @@ border-radius:15px;
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(236, 219, 186);</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>Show facial landmarks</string>
@@ -166,7 +194,7 @@ border-radius:15px;
        </property>
        <property name="minimumSize">
         <size>
-         <width>250</width>
+         <width>200</width>
          <height>30</height>
         </size>
        </property>
@@ -177,7 +205,7 @@ border-radius:15px;
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(236, 219, 186);</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>Show facial reenactment</string>
@@ -188,7 +216,7 @@ border-radius:15px;
       <widget class="QPushButton" name="mainPageButton">
        <property name="minimumSize">
         <size>
-         <width>250</width>
+         <width>200</width>
          <height>30</height>
         </size>
        </property>
@@ -199,7 +227,13 @@ border-radius:15px;
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(236, 219, 186);</string>
+        <string notr="true">QPushButton{
+background-color:red;
+color:white;
+}
+QPushButton:hover{
+background-color:rgba(255,0,0,0.5);
+}</string>
        </property>
        <property name="text">
         <string>End demo</string>

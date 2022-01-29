@@ -28,14 +28,14 @@ class demoFx:
     
     def facialLandmarksFrame(self,Image):
         # blank canva
-        blank = np.zeros((360,640,3),dtype=np.uint8)
+        blank = 255*np.ones((360,640,3),dtype=np.uint8)
         # detect face
         Gray = cv2.cvtColor(Image, cv2.COLOR_BGR2GRAY)
         faces = self.detector(Gray)
         for face in faces:
             landmarks = self.predictor(Gray,face)
             for n in range(68):
-                cv2.circle(blank,(landmarks.part(n).x,landmarks.part(n).y),2,(200,75,49),-1)
+                cv2.circle(blank,(landmarks.part(n).x,landmarks.part(n).y),2,(33,147,176),-1)
             break
         blank = QImage(blank.data,
                        blank.shape[1],
