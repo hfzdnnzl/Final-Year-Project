@@ -305,7 +305,7 @@ class ConferenceWindow(QDialog):
         i = int(math.floor(math.log(size_bytes, 1024)))
         p = math.pow(1024, i)
         s = round(size_bytes / p, 2)
-        return "%s%sps" % (s, size_name[i])
+        return "%s %sps" % (s, size_name[i])
 ### CODING ABOVE
 
 class DemoWindow(QDialog):

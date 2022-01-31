@@ -145,7 +145,8 @@ class videoReceiver(QThread):
 
                 # count frame rate
                 cTime = time.time()
-                fps.append(1/(cTime-pTime))
+                dTime = cTime-pTime
+                if dTime!=0: fps.append(1/dTime)
                 pTime = cTime
                 # update frame rate
                 if len(fps)>=10:
@@ -196,7 +197,8 @@ class videoSender(QThread):
                         frame = imutils.resize(frame,width=640)
                         # calculate frame rate
                         cTime = time.time()
-                        fps.append(1/(cTime-pTime))
+                        dTime = cTime-pTime
+                        if dTime!=0: fps.append(1/dTime)
                         pTime = cTime
                         # update frame rate
                         if len(fps)>=10:
@@ -272,7 +274,8 @@ class landmarkReceiver(QThread):
 
             # count frame rate
             cTime = time.time()
-            fps.append(1/(cTime-pTime))
+            dTime = cTime-pTime
+            if dTime!=0: fps.append(1/dTime)
             pTime = cTime
             # update frame rate
             if len(fps)>=10:
@@ -284,9 +287,9 @@ class landmarkReceiver(QThread):
                     self.landmarkReceive.emit(np.array(['']))
                     time.sleep(1)
             elif self.ganOff:
-                blank = np.zeros((360,640,3),dtype=np.uint8)
+                blank = 255*np.ones((360,640,3),dtype=np.uint8)
                 for point in message:
-                    cv2.circle(blank, (int(point[0]), int(point[1])), 2, (200,75,49), -1)
+                    cv2.circle(blank, (int(point[0]), int(point[1])), 2, (33,147,176), -1)
                 # send data
                 blank_list = np.array([blank,currentFPS,obj_size],dtype=object)
                 self.landmarkReceive.emit(blank_list)
@@ -349,7 +352,7 @@ class landmarkSender(QThread):
                         face = faces[0]
                         landmarks = self.predictor(gray,face)
                         # get facial landmark points
-                        blank = np.zeros((360,640,3),dtype=np.uint8)
+                        blank = 255*np.ones((360,640,3),dtype=np.uint8)
                         points = []
                         for n in range(68):
                             if n==60 or n==64:
@@ -357,10 +360,11 @@ class landmarkSender(QThread):
                             points.append(landmarks.part(n).x)
                             points.append(landmarks.part(n).y)
                             # draw facial landmarks
-                            cv2.circle(blank,(landmarks.part(n).x,landmarks.part(n).y),2,(200,75,49),-1)
+                            cv2.circle(blank,(landmarks.part(n).x,landmarks.part(n).y),2,(33,147,176),-1)
                         # count frame rate
                         cTime = time.time()
-                        fps.append(1/(cTime-pTime))
+                        dTime = cTime-pTime
+                        if dTime!=0: fps.append(1/dTime)
                         pTime = cTime
                         # update frame rate
                         if len(fps)>=10:
