@@ -371,7 +371,7 @@ border-radius:15px;</string>
      <rect>
       <x>870</x>
       <y>440</y>
-      <width>156</width>
+      <width>227</width>
       <height>154</height>
      </rect>
     </property>
@@ -446,11 +446,20 @@ border-radius:15px;</string>
           </item>
           <item>
            <widget class="QLabel" name="downloadSizeLabel">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="styleSheet">
              <string notr="true"/>
             </property>
             <property name="text">
              <string>0 kb/s</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -498,11 +507,20 @@ border-radius:15px;</string>
           </item>
           <item>
            <widget class="QLabel" name="uploadSizeLabel">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="styleSheet">
              <string notr="true"/>
             </property>
             <property name="text">
              <string>0 kb/s</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -550,11 +568,20 @@ border-radius:15px;</string>
           </item>
           <item>
            <widget class="QLabel" name="localFrameLabel">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="styleSheet">
              <string notr="true"/>
             </property>
             <property name="text">
              <string>0 fps</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -602,6 +629,12 @@ border-radius:15px;</string>
           </item>
           <item>
            <widget class="QLabel" name="clientFrameLabel">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="maximumSize">
              <size>
               <width>16777215</width>
@@ -613,6 +646,9 @@ border-radius:15px;</string>
             </property>
             <property name="text">
              <string>0 fps</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>

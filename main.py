@@ -5,7 +5,7 @@ Created on Tue Jan 18 15:57:38 2022
 @author: hafiz
 """
 
-import sys,demo,conference,time,torch
+import sys,demo,conference,time,torch,math
 import pyperclip as pc
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
@@ -94,7 +94,14 @@ class MainWindow(QDialog):
         self.msg.setWindowTitle(title)
         self.msg.setWindowIcon(QIcon("user_interfaces/sharingan_icon.png"))
         self.msg.setText(errorMessage)
-        self.msg.setStyleSheet("QMessageBox{background-color: rgb(22, 22, 22);border-radius:15px;border-width :1px;} QLabel{color: rgb(236, 219, 186)}")
+        self.msg.setStyleSheet(
+            "QMessageBox{"
+            "background-color: QLinearGradient(x1:0, y1:0, x2:1, y2:1, stop: 0 #2193b0, stop: 1 #6dd5ed);"
+            "border-radius:15px;border-width :1px;} QLabel{color: white}"
+            "QPushButton{"
+            "background-color: white;color:#2193b0;border-radius: 10px;width:100px;height:30px;}"
+            "QPushButton:hover{"
+            "background-color: #2193b0;color: white;border: 1px solid white;}")
         self.msg.setIcon(Icon)
         self.msg.exec_()
 
@@ -120,12 +127,15 @@ class ConferenceWindow(QDialog):
         # disable reenactment if cuda is not installed
         if torch.version.cuda is None:
             self.facialReenactmentButtn.setEnabled(False)
+        # button styling
+        self.selectedButtonStyling = "QPushButton{background-color:red;color:white;}"
+        self.selectedButtonStyling += "QPushButton:hover{background-color:rgba(255,0,0,0.5);}"
 
     def localImageUpdateSlot(self,Image):
         if len(Image)==1:
             self.localCameraLabel.setText("Local Camera")
             self.localFrameLabel.setText("0 fps")
-        elif len(Image)==2:
+        elif len(Image)>1:
             self.localFrameLabel.setText(str(Image[1]) + " fps")
             self.uploadSizeLabel.setText(self.convert_size(Image[2]))
             Image = Image[0]
@@ -141,7 +151,7 @@ class ConferenceWindow(QDialog):
         if len(Image)==1:
             self.clientCameraLabel.setText("Client Camera")
             self.clientFrameLabel.setText("0 fps")
-        elif len(Image)==2:
+        elif len(Image)>1:
             self.clientFrameLabel.setText(str(Image[1]) + " fps")
             self.downloadSizeLabel.setText(self.convert_size(Image[2]))
             Image = Image[0]
@@ -205,7 +215,14 @@ class ConferenceWindow(QDialog):
         msg.setWindowTitle(title)
         msg.setWindowIcon(QIcon("user_interfaces/sharingan_icon.png"))
         msg.setText(errorMessage)
-        msg.setStyleSheet("QMessageBox{background-color: rgb(22, 22, 22);border-radius:15px;border-width :1px;} QLabel{color: rgb(236, 219, 186)}")
+        msg.setStyleSheet(
+            "QMessageBox{"
+            "background-color: QLinearGradient(x1:0, y1:0, x2:1, y2:1, stop: 0 #2193b0, stop: 1 #6dd5ed);"
+            "border-radius:15px;border-width :1px;} QLabel{color: white}"
+            "QPushButton{"
+            "background-color: white;color:#2193b0;border-radius: 10px;width:100px;height:30px;}"
+            "QPushButton:hover{"
+            "background-color: #2193b0;color: white;border: 1px solid white;}")
         msg.setIcon(Icon)
         msg.exec_()
 
@@ -229,67 +246,66 @@ class ConferenceWindow(QDialog):
         if self.cameraButton.text() == "Open Camera":
             # stop sending facial data
             self.facialLandmarksButton.setText("Show Facial Landmarks")
-            self.facialLandmarksButton.setStyleSheet("background-color: rgb(236, 219, 186);")
+            self.facialLandmarksButton.setStyleSheet("")
             self.landmarks_sender.detectorOff = True
             self.landmarks_sender.cameraOff = False
             time.sleep(1)
             # change state
             self.cameraButton.setText("Off Camera")
-            self.cameraButton.setStyleSheet("background-color:rgb(208, 52, 44);")
+            self.cameraButton.setStyleSheet(self.selectedButtonStyling)
             self.video_sender.cameraOff = False
         elif self.cameraButton.text() == "Off Camera":
             self.cameraButton.setText("Open Camera")
-            self.cameraButton.setStyleSheet('background-color: rgb(236, 219, 186);')
+            self.cameraButton.setStyleSheet("")
             self.video_sender.cameraOff = True
             self.landmarks_sender.cameraOff = True
 
     def micState(self):
         if self.voiceButton.text() == "Open Microphone":
             self.voiceButton.setText("Off Microphone")
-            self.voiceButton.setStyleSheet('background-color:rgb(208, 52, 44);')
+            self.voiceButton.setStyleSheet(self.selectedButtonStyling)
             self.audio_sender.mute = False
         elif self.voiceButton.text() == "Off Microphone":
             self.voiceButton.setText("Open Microphone")
-            self.voiceButton.setStyleSheet('background-color: rgb(236, 219, 186);')
+            self.voiceButton.setStyleSheet('')
             self.audio_sender.mute = True
 
     def facState(self):
         if self.facialLandmarksButton.text()=="Show Facial Landmarks":
             # stop sending webcam data
             self.cameraButton.setText("Open Camera")
-            self.cameraButton.setStyleSheet('background-color: rgb(236, 219, 186);')
+            self.cameraButton.setStyleSheet('')
             self.video_sender.cameraOff = True
             time.sleep(1)
             # change state
             self.facialLandmarksButton.setText("Hide Facial Landmarks")
-            self.facialLandmarksButton.setStyleSheet("background-color:rgb(208, 52, 44);")
+            self.facialLandmarksButton.setStyleSheet(self.selectedButtonStyling)
             self.landmarks_sender.detectorOff = False
             self.landmarks_sender.cameraOff = False
             
         elif self.facialLandmarksButton.text()=="Hide Facial Landmarks":
             self.facialLandmarksButton.setText("Show Facial Landmarks")
-            self.facialLandmarksButton.setStyleSheet("background-color: rgb(236, 219, 186);")
+            self.facialLandmarksButton.setStyleSheet("")
             self.landmarks_sender.detectorOff = True
             self.landmarks_sender.cameraOff = True
 
     def ganState(self):
         if self.facialReenactmentButton.text() =="Show Facial Reenactment":
             self.facialReenactmentButton.setText("Hide Facial Reenactment")
-            self.facialReenactmentButton.setStyleSheet("background-color:rgb(208, 52, 44);")
+            self.facialReenactmentButton.setStyleSheet(self.selectedButtonStyling)
             self.landmarks_receiver.ganOff = False
         elif self.facialReenactmentButton.text() =="Hide Facial Reenactment":
             self.facialReenactmentButton.setText("Show Facial Reenactment")
-            self.facialReenactmentButton.setStyleSheet("background-color:rgb(236, 219, 186);")
+            self.facialReenactmentButton.setStyleSheet("")
             self.landmarks_receiver.ganOff = True
 
-    def convert_size(size_bytes):
-        if size_bytes == 0:
-            return "0B"
+    def convert_size(self,size_bytes):
+        if size_bytes == 0:return "0B"
         size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
         i = int(math.floor(math.log(size_bytes, 1024)))
         p = math.pow(1024, i)
         s = round(size_bytes / p, 2)
-        return "%s %s" % (s, size_name[i])
+        return "%s%sps" % (s, size_name[i])
 ### CODING ABOVE
 
 class DemoWindow(QDialog):

@@ -36,8 +36,7 @@ class audioReceiver(QThread):
         while self.threadActive:
             try:
                 message = com_socket.recv(self.frames_per_buffer)
-                if message!=b'':
-                    self.stream.write(message)
+                if message!=b'':self.stream.write(message)
             except:
                 print("Error getting audio")
                 self.voiceReceive.emit("Closing")
@@ -106,6 +105,7 @@ class videoReceiver(QThread):
         self.server.listen()
 
     def run(self):
+        np.warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
         com_socket, address = self.server.accept()
         print(f"Video receiver connected to {address}")
         self.ThreadActive = True
@@ -152,8 +152,8 @@ class videoReceiver(QThread):
                     currentFPS = int(np.mean(fps))
                     fps = []
                 # object
-                obj_size = sys.getsizeof(frame)*currentFPS
-                frame_list = np.array([frame,currentFPS,obj_size])
+                obj_size = int(sys.getsizeof(frame_data)*currentFPS)
+                frame_list = np.array([frame,currentFPS,obj_size],dtype=object)
                 self.videoReceive.emit(frame_list)
 
     def stop(self):
@@ -172,6 +172,7 @@ class videoSender(QThread):
         self.cameraOff = cameraOff
 
     def run(self):
+        np.warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
         self.ThreadActive = True
         while self.ThreadActive:
             try:
@@ -206,8 +207,8 @@ class videoSender(QThread):
                         data = pickle.dumps(decoded,0)
                         message = struct.pack(">L",len(data))+data
                         # send data
-                        obj_size = sys.getsizeof(message)*currentFPS
-                        frame_list = np.array([frame,currentFPS,obj_size])
+                        obj_size = int(sys.getsizeof(message)*currentFPS)
+                        frame_list = np.array([frame,currentFPS,obj_size],dtype=object)
                         self.videoSend.emit(frame_list)
                         self.client.sendall(message)
                     self.Capture.release()
@@ -245,6 +246,7 @@ class landmarkReceiver(QThread):
         self.skipMax = skipMax
 
     def run(self):
+        np.warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
         com_socket, address = self.server.accept()
         self.server.settimeout(5)
         print(f"Landmarks receiver connected to {address}")
@@ -258,7 +260,7 @@ class landmarkReceiver(QThread):
         while self.ThreadActive:
             try:
                 message = com_socket.recv(4096)
-                obj_size = sys.getsizeof(message)*currentFPS
+                obj_size = int(sys.getsizeof(message)*currentFPS)
             except:
                 print("Error getting facial landmarks")
                 time.sleep(1)
@@ -286,13 +288,13 @@ class landmarkReceiver(QThread):
                 for point in message:
                     cv2.circle(blank, (int(point[0]), int(point[1])), 2, (200,75,49), -1)
                 # send data
-                blank_list = np.array([blank,currentFPS,obj_size])
+                blank_list = np.array([blank,currentFPS,obj_size],dtype=object)
                 self.landmarkReceive.emit(blank_list)
             elif not self.ganOff and skipIter%10==0:
                 image, _ = self.myGAN.reenactment(self.test_image,message)
                 image = cv2.resize(image[0],(400,400))
                 # send data
-                image_list = np.array([image,currentFPS,obj_size])
+                image_list = np.array([image,currentFPS,obj_size],dtype=object)
                 self.landmarkReceive.emit(image_list)
                 skipIter = 0
             skipIter += 1
@@ -317,6 +319,7 @@ class landmarkSender(QThread):
         self.predictor = dlib.shape_predictor('models/shape_predictor_68_face_landmarks.dat')
 
     def run(self):
+        np.warnings.filterwarnings('error', category=np.VisibleDeprecationWarning)
         self.ThreadActive = True
         self.cameraOff = True
         while self.ThreadActive:
@@ -370,8 +373,8 @@ class landmarkSender(QThread):
                         data = pickle.dumps(points)
                         self.client.send(data)
                         # send data
-                        obj_size = sys.getsizeof(data)*currentFPS
-                        blank_list = np.array([blank,currentFPS,obj_size])
+                        obj_size = int(sys.getsizeof(data)*currentFPS)
+                        blank_list = np.array([blank,currentFPS,obj_size],dtype=object)
                         self.landmarkSend.emit(blank_list)
                     # release camera
                     self.Capture.release()
