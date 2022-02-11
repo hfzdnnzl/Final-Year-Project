@@ -174,7 +174,7 @@ class ConferenceWindow(QDialog):
         self.video_receiver.videoReceive.connect(self.clientImageUpdateSlot)
         self.video_receiver.start()
         # landmark
-        self.landmarks_receiver = conference.landmarkReceiver(self.local_ip,8888,enable_cuda=self.enableCuda)
+        self.landmarks_receiver = conference.landmarkReceiver(self.local_ip,8888,enable_cuda=self.enableCuda,skipMax=3)
         self.landmarks_receiver.landmarkReceive.connect(self.clientImageUpdateSlot)
         self.landmarks_receiver.start()
 
@@ -439,7 +439,7 @@ class DemoWindow(QDialog):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = QtWidgets.QStackedWidget()
-    widget.setWindowTitle("Gogo Meat!")
+    widget.setWindowTitle("GAN Meet!")
     widget.setWindowIcon(QIcon("user_interfaces/sharingan_icon.png"))
 
     mainWindow = MainWindow()

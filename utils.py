@@ -25,7 +25,6 @@ def process_image(image,points,angle=0, flip=False, sigma=1,size=128, tight=16):
 
     return image, source_maps, points
 
-
 def _gaussian(
         size=3, sigma=0.25, amplitude=1, normalize=False, width=None,
         height=None, sigma_horz=None, sigma_vert=None, mean_horz=0.5,
@@ -51,7 +50,6 @@ def _gaussian(
         gauss = gauss / np.sum(gauss)
     return gauss
 
-
 def draw_gaussian(image, point, sigma):
     # Check if the gaussian is inside
     point[0] = round( point[0], 2)
@@ -73,9 +71,6 @@ def draw_gaussian(image, point, sigma):
           ] = image[img_y[0] - 1:img_y[1], img_x[0] - 1:img_x[1]] + g[g_y[0] - 1:g_y[1], g_x[0] - 1:g_x[1]]
     image[image > 1] = 1
     return image
-
-
-
 
 def generate_maps(points, sigma, size=256):
     maps = None 
@@ -116,13 +111,10 @@ def crop( image, landmarks , size, tight=8):
         return im, pts_
 
 def generate_Ginput( img, target_pts , sigma , size=256 ):
-
     target_maps = generate_maps(target_pts, sigma, size)
     target_maps = target_maps.type_as(torch.FloatTensor())
     A_to_B = torch.cat((img, target_maps),0)  
     return A_to_B
-
-
 
 def flip_ImAndPts(image,landmarks):
     flipImg = cv2.flip(image, 1)
@@ -137,7 +129,6 @@ def affine_trans(image,landmarks,angle=None):
     if angle is None:
         angle = 30*torch.randn(1)
        
-    
     (h, w) = image.shape[:2]
     (cX, cY) = (w // 2, h // 2)
  
@@ -157,7 +148,6 @@ def affine_trans(image,landmarks,angle=None):
     new_landmarks = new_landmarks.dot(M.transpose())
 
     return dst, new_landmarks
-
 
 def gram_matrix(input):
     bsize, ch, r, c = input.size()  

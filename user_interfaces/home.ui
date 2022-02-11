@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>GoGo Meat!</string>
+   <string>GAN Meet!</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QDialog {
@@ -97,7 +97,7 @@ color: #2193b0;
         <string notr="true">color:white;</string>
        </property>
        <property name="text">
-        <string>Welcome to Gogo Meat!</string>
+        <string>Welcome to GAN Meet!</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

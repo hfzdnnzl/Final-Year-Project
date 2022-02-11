@@ -1,10 +1,10 @@
-import torch
+# import torch
+# import csv
+# import math
+# import functools
 import torch.nn as nn
 import torch.nn.init as weight_init
-import csv
-import math
 import torch.nn.functional as F
-import functools
 
 def init_weights(net, init_type='normal', gain=0.02):
     def init_func(m):
@@ -29,15 +29,12 @@ def init_weights(net, init_type='normal', gain=0.02):
     print('initialize network with %s' % init_type)
     net.apply(init_func)
 
-
 def downsample_block(input_channels=64, output_channels=128, norm_layer=nn.BatchNorm2d):
     # This block applies a downsample of factor = 4 in the scale (x,y)
     block = [nn.Conv2d( input_channels, output_channels, kernel_size=4, stride=2, padding=1)]
     block += [norm_layer(output_channels)]
     block += [nn.LeakyReLU(0.2)]
     return block
-
-
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -84,7 +81,6 @@ class ResidualBlock(nn.Module):
 
         return x + residual
 
-    
 class Generator(nn.Module):
     def __init__(self, conv_dim=64, c_dim=66, repeat_num=6):
         super(Generator, self).__init__()
